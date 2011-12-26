@@ -2,10 +2,6 @@ namespace('EvCl.Evernote', function(exports){
 	var config = EvCl.Evernote.config;
 	var api = EvCl.Evernote.api;
 	
-	var checkAuth = function(){
-		
-	};
-	
 	exports.listNotebooks = function(args) {
 		var auth = EvCl.Evernote.auth;
 		if(!auth){
@@ -22,9 +18,9 @@ namespace('EvCl.Evernote', function(exports){
 				args.error(e.error);
 			}
 		});	
-	};
+	}
 	
-	exports.findNotes = function(args) {
+	exports.addNotebook = function(args){
 		var auth = EvCl.Evernote.auth;
 		if(!auth){
 			/*
@@ -33,16 +29,14 @@ namespace('EvCl.Evernote', function(exports){
 			return;
 		}
 		var notestore = api.createNoteStoreClient(config.url+"note/"+auth.shardId);
-		var filter = api.createNoteFilter();
-		if(args.notebook){
-			filter.notebookGuid = args.notebook.guid;
-		}
-		notestore.findNotes(auth.token, filter, 0, 100, function(e){
+		var notebook = api.createNotebook();
+		notebook.name = args.name;
+		notestore.createNotebook(auth.token, notebook, function(e){
 			if(e.type == 'success'){
-				args.success(e.result);
+				args.success();
 			}else{
 				args.error(e.error);
 			}
 		});
-	};	
+	}
 });

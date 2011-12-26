@@ -5,7 +5,8 @@ namespace('EvCl.UI', function(exports){
 		 */
 		var window = Ti.UI.createWindow({
 			title:L('Login Evernote'),
-			backgroundImage:'images/bg.png'
+			backgroundColor:'#d8dfea',
+			barColor:'#338844'
 		});
 		
 		var email_ = Ti.UI.createLabel({
@@ -13,7 +14,7 @@ namespace('EvCl.UI', function(exports){
 			width:'auto',
 			height:'auto',
 			text:L('E-Mail Address'),
-			color:'#eeeeee'
+			color:'#444444'
 		});
 		window.add(email_);
 		
@@ -30,7 +31,7 @@ namespace('EvCl.UI', function(exports){
 			width:'auto',
 			height:'auto',
 			text:L('Password'),
-			color:'#eeeeee'
+			color:'#444444'
 		});
 		window.add(password_);
 

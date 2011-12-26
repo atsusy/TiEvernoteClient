@@ -4,6 +4,7 @@ Ti.include('evernote/config.js');
 Ti.include('evernote/api.js');
 Ti.include('evernote/authenticate.js');
 Ti.include('evernote/notebook.js');
+Ti.include('evernote/note.js');
 Ti.include('ui/login.js');
 Ti.include('ui/notebooks.js');
 Ti.include('ui/notes.js');
@@ -23,8 +24,6 @@ tabGroup.addEventListener('focus', function(e){
 });
 
 tabGroup.open();
-
-
 
 /*
  * Currently open login window everytime.

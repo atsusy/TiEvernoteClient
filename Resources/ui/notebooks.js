@@ -4,18 +4,25 @@ namespace('EvCl.UI', function(exports){
 		 * UI Layout definitions
 		 */
 		var window = Ti.UI.createWindow({
+			barColor:'#338844',
+			title:L('Notebooks')
 		});
 		
 		var notebooksTable = Ti.UI.createTableView({
 		});
 		window.add(notebooksTable);
+		
+		var addNotebookButton = Ti.UI.createButton({
+			systemButton:Ti.UI.iPhone.SystemButton.ADD
+		});
+		window.rightNavButton = addNotebookButton;
 
 		/*
 		 * Functions
 		 */
 		var createNotebookRow = function(notebook){
 			var row = Ti.UI.createTableViewRow({
-				height:'auto',
+				height:48,
 				hasChild:true,
 				notebook:notebook
 			});
@@ -46,11 +53,8 @@ namespace('EvCl.UI', function(exports){
 			
 			return row;
 		};
-
-		/*
-		 * Event Handlers
-		 */		
-		Ti.App.addEventListener('app:authenticated', function(e){
+		
+		var listNotebooks = function(){
 			EvCl.Evernote.listNotebooks({
 				success:function(notebooks){
 					notebooksTable.data = notebooks.map(function(notebook){
@@ -62,7 +66,83 @@ namespace('EvCl.UI', function(exports){
 					 * TODO
 					 */
 				}
-			});			
+			});					
+		}
+
+		/*
+		 * Event Handlers
+		 */		
+		Ti.App.addEventListener('app:authenticated', function(e){
+			listNotebooks();
+		});
+
+		Ti.App.addEventListener('app:notebookAdded', function(e){
+			listNotebooks();
+		});
+		
+		addNotebookButton.addEventListener('click', function(){
+			EvCl.UI.currentTab.open(EvCl.UI.createAddNotebookWindow());
+		});
+		
+		return window;
+	}
+	
+	exports.createAddNotebookWindow = function(){
+		/*
+		 * UI Layout definitions
+		 */
+		var window = Ti.UI.createWindow({
+			barColor:'#338844',
+			backgroundColor:'#d8dfea',
+			title:L('Add Notebook')
+		});
+		
+		var titleField = Ti.UI.createTextField({
+			top:40,
+			left:8,
+			right:8,
+			color:'black',
+			hintText:'Enter new notebook name',
+			height:40,
+	        borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED
+		});
+		window.add(titleField);
+		
+		var addButton = Ti.UI.createButton({
+			title:L('Add')
+		})
+		window.rightNavButton = addButton;
+		
+		var addingIndicator = Ti.UI.createActivityIndicator({
+			width:32,
+			height:32,
+			visible:true
+		});
+		
+		/*
+		 * Event Handlers
+		 */		
+		window.addEventListener('open', function(){
+			titleField.focus();
+		});
+		
+		addButton.addEventListener('click', function(e){
+			if(!titleField.value){
+				alert(L("Please enter notebook name."));
+				return;
+			}
+			window.rightNavButton = addingIndicator;
+			EvCl.Evernote.addNotebook({
+				name:titleField.value,
+				success:function(){
+					window.close();
+					window.rightNavButton = addButton;
+					Ti.App.fireEvent("app:notebookAdded");
+				},
+				error:function(){
+					window.rightNavButton = addButton;
+				}
+			});
 		});
 		
 		return window;
