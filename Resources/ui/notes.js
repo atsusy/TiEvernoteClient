@@ -125,25 +125,146 @@ namespace('EvCl.UI', function(exports){
 			visible:true
 		});
 		
-		var titleField = Ti.UI.createTextField({
-			top:8,
-			left:8,
-			right:8,
-			color:'black',
-			hintText:'Enter new note title',
-			height:40,
-	        borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED
+		var sections = [];
+		
+		var tableView = Ti.UI.createTableView({
+			style:Ti.UI.iPhone.TableViewStyle.GROUPED
 		});
-		window.add(titleField);
+		window.add(tableView);
+		
+		var titleSection = Ti.UI.createTableViewSection({
+			headerTitle:'New note'
+		});
+		sections.push(titleSection);
+		
+		var titleRow = Ti.UI.createTableViewRow({
+			touchEnabled:false,
+			selectionStyle:Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+		});
+		titleSection.add(titleRow);
+		
+		var titleField = Ti.UI.createTextField({
+			paddingLeft:10,
+			paddingRight:10,
+			color:'black',
+			hintText:'Enter new note title'
+		});
+		titleRow.add(titleField);
+		
+		var contentSection = Ti.UI.createTableViewSection({
+			touchEnabled:false,
+			selectionStyle:Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+		});
+		sections.push(contentSection);
+		
+		var contentRow = Ti.UI.createTableViewRow({
+			height: 140
+		});
+		contentSection.add(contentRow);
 		
 		var contentArea = Ti.UI.createTextArea({
-			top:60,
-			left:8,
-			right:8,
-			bottom:8,
-			color:'black'
+			borderWidth:0,
+			borderRadius:9,
+			color:'black',
+			font:{ fontSize:'16' },
+			value:''
 		});
-		window.add(contentArea);
+		contentRow.add(contentArea);
+		
+		var tagsSection = Ti.UI.createTableViewSection({
+			isTagSection:true,
+			headerTitle:'Note tags',
+			touchEnabled:false,
+			selectionStyle:Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+		});
+		sections.push(tagsSection);
+		
+		var addTagsRow = Ti.UI.createTableViewRow({
+			title:'+ Add new tag'
+		});
+		tagsSection.add(addTagsRow);
+		
+		addTagsRow.addEventListener('click', function(){
+			var tagRow = Ti.UI.createTableViewRow({
+				isTagRow:true,
+				editable:true,
+				touchEnabled:false,
+				selectionStyle:Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+			});
+			
+			var tagField = Ti.UI.createTextField({
+				paddingLeft:10,
+				paddingRight:10,
+				color:'black',
+				hintText:'Enter new note tag'
+			});
+			tagRow.add(tagField);
+			
+			tableView.insertRowAfter(2, tagRow);
+		});
+		
+		var attributesSection = Ti.UI.createTableViewSection({
+			headerTitle:'Note attributes',
+			touchEnabled:false,
+			selectionStyle:Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+		});
+		sections.push(attributesSection);
+		
+		var gpsRow = Ti.UI.createTableViewRow({
+			title: 'GPS',
+			touchEnabled: false,
+			selectionStyle: Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+		});
+		attributesSection.add(gpsRow);
+		
+		var gpsSwitch = Ti.UI.createSwitch({
+			right: 10,
+			value: false
+		});
+		gpsRow.add(gpsSwitch);
+		
+		var latitude;
+		var longitude;
+		
+		gpsSwitch.addEventListener('change', function(){
+			if (this.value) {
+				if (Ti.Geolocation.locationServicesEnabled) {
+					Ti.Geolocation.getCurrentPosition(function(e){
+						if (e.error) {
+							/*
+							 * TODO
+							 */
+						} else {
+							latitude = e.coords.latitude;
+							longitude = e.coords.longitude;
+						}
+					});
+				} else {
+					/*
+					 * TODO
+					 */
+				}
+			} else {
+				latitude = null;
+				longitude = null;
+			}
+		});
+		
+		var sourceUrlRow = Ti.UI.createTableViewRow({
+			touchEnabled: false,
+			selectionStyle: Ti.UI.iPhone.TableViewCellSelectionStyle.NONE
+		});
+		attributesSection.add(sourceUrlRow);
+		
+		var sourceUrlField = Ti.UI.createTextField({
+			paddingLeft:10,
+			paddingRight:10,
+			color:'black',
+			hintText:'Enter source URL'
+		});
+		sourceUrlRow.add(sourceUrlField);
+		
+		tableView.setData(sections);
 		
 		/*
 		 * Functions
@@ -165,11 +286,29 @@ namespace('EvCl.UI', function(exports){
 				alert(L("Please enter note title."));
 				return;
 			}
+			var tagNames = [];
+			tableView.getData().forEach(function(value, key, array){
+				if (value.isTagSection) {
+					value.rows.forEach(function(value, key, array){
+						if (value.isTagRow) {
+							if (value.getChildren()[0].value) {
+								tagNames.push(value.getChildren()[0].value);
+							}
+						}
+					});
+				}
+			});
 			window.rightNavButton = addingIndicator;
 			EvCl.Evernote.addNote({
 				title:titleField.value,
 				content:createENML(contentArea.value),
 				notebookGuid:notebook.guid,
+				tagNames:tagNames,
+				attributes:{
+					latitude:latitude,
+					longitude:longitude,
+					sourceURL:sourceUrlField.value
+				},
 				success:function(){
 					window.close();
 					window.rightNavButton = addButton;

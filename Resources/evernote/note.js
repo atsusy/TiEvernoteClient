@@ -54,7 +54,13 @@ namespace('EvCl.Evernote', function(exports){
 		var note = api.createNote();
 		note.title = args.title;
 		note.content = args.content;
+		note.tagNames = args.tagNames;
 		note.notebookGuid = args.notebookGuid;
+		var attributes = api.createNoteAttributes();
+		if (args.attributes.latitude) { attributes.latitude = args.attributes.latitude; }
+		if (args.attributes.longitude) { attributes.longitude = args.attributes.longitude; }
+		if (args.attributes.sourceURL) { attributes.sourceURL = args.attributes.sourceURL; }
+		note.attributes = attributes;
 		notestore.createNote(auth.token, note, function(e){
 			if(e.type == 'success'){
 				args.success();
