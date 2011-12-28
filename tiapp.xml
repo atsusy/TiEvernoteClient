@@ -8,7 +8,7 @@
         <target device="blackberry">false</target>
     </deployment-targets>
     <sdk-version>1.8.0.1</sdk-version>
-    <id>jp.msmc.tievernote</id>
+    <id>jp.msmc.TiEvernote</id>
     <name>TiEvernote</name>
     <version>1.0</version>
     <publisher>Atsushi Kataoka</publisher>
@@ -37,6 +37,6 @@
     </iphone>
     <android xmlns:android="http://schemas.android.com/apk/res/android"/>
     <modules>
-    	<module version="0.1">jp.masuidrive.ti.evernoteapi</module>
+        <module version="0.1">jp.masuidrive.ti.evernoteapi</module>
     </modules>
 </ti:app>
