@@ -23,6 +23,7 @@ namespace('EvCl.UI', function(exports){
 			width:240,
 			height:35,
 			borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
+			value:Ti.App.Properties.getString('email')
 		});
 		window.add(email);
 		
@@ -67,7 +68,7 @@ namespace('EvCl.UI', function(exports){
 			EvCl.Evernote.authenticate({
 				email:email.value,
 				password:password.value,
-				success:function(auth) {
+				success:function() {
 					loginIndicator.hide();
 					Ti.App.fireEvent('app:authenticated');
 					window.close();	

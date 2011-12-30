@@ -3,15 +3,18 @@ namespace('EvCl.Evernote', function(exports){
 	var api = EvCl.Evernote.api;
 	
 	exports.getNoteContent = function(args) {
-		var auth = EvCl.Evernote.auth;
-		if(!auth){
-			/*
-			 * TODO
-			 */
-			return;
-		}
-		var notestore = api.createNoteStoreClient(config.url+"note/"+auth.shardId);
-		notestore.getNoteContent(auth.token, args.guid, function(e){
+		EvCl.Evernote.refreshAuthentication({
+			success:function(){},
+			error:function(error){
+				var loginWindow = EvCl.UI.createLoginWindow();
+				loginWindow.open({
+					modal:true
+				});
+			}
+		});
+		
+		var notestore = api.createNoteStoreClient(config.url+"note/"+Ti.App.Properties.getString('userShardId'));
+		notestore.getNoteContent(Ti.App.Properties.getString('authenticationToken'), args.guid, function(e){
 			if(e.type == 'success'){
 				args.success(e.result);
 			}else{
@@ -21,19 +24,22 @@ namespace('EvCl.Evernote', function(exports){
 	}
 	
 	exports.findNotes = function(args) {
-		var auth = EvCl.Evernote.auth;
-		if(!auth){
-			/*
-			 * TODO
-			 */
-			return;
-		}
-		var notestore = api.createNoteStoreClient(config.url+"note/"+auth.shardId);
+		EvCl.Evernote.refreshAuthentication({
+			success:function(){},
+			error:function(error){
+				var loginWindow = EvCl.UI.createLoginWindow();
+				loginWindow.open({
+					modal:true
+				});
+			}
+		});
+		
+		var notestore = api.createNoteStoreClient(config.url+"note/"+Ti.App.Properties.getString('userShardId'));
 		var filter = api.createNoteFilter();
 		if(args.notebook){
 			filter.notebookGuid = args.notebook.guid;
 		}
-		notestore.findNotes(auth.token, filter, 0, 100, function(e){
+		notestore.findNotes(Ti.App.Properties.getString('authenticationToken'), filter, 0, 100, function(e){
 			if(e.type == 'success'){
 				args.success(e.result);
 			}else{
@@ -43,14 +49,17 @@ namespace('EvCl.Evernote', function(exports){
 	}
 	
 	exports.addNote = function(args){
-		var auth = EvCl.Evernote.auth;
-		if(!auth){
-			/*
-			 * TODO
-			 */
-			return;
-		}
-		var notestore = api.createNoteStoreClient(config.url+"note/"+auth.shardId);
+		EvCl.Evernote.refreshAuthentication({
+			success:function(){},
+			error:function(error){
+				var loginWindow = EvCl.UI.createLoginWindow();
+				loginWindow.open({
+					modal:true
+				});
+			}
+		});
+		
+		var notestore = api.createNoteStoreClient(config.url+"note/"+Ti.App.Properties.getString('userShardId'));
 		var note = api.createNote();
 		note.title = args.title;
 		note.content = args.content;
@@ -61,7 +70,7 @@ namespace('EvCl.Evernote', function(exports){
 		if (args.attributes.longitude) { attributes.longitude = args.attributes.longitude; }
 		if (args.attributes.sourceURL) { attributes.sourceURL = args.attributes.sourceURL; }
 		note.attributes = attributes;
-		notestore.createNote(auth.token, note, function(e){
+		notestore.createNote(Ti.App.Properties.getString('authenticationToken'), note, function(e){
 			if(e.type == 'success'){
 				args.success();
 			}else{
