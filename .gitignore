@@ -3,3 +3,6 @@ config.js
 build
 *~
 tmp
+
+modules/
+.settings/
