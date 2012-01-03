@@ -41,11 +41,6 @@ tabGroup.addEventListener('focus', function(e){
 
 tabGroup.open();
 
-/*
- * Currently open login window everytime.
- * I will persist authentication information and 
- * depersist it when app startups and authenticate automatically.
- */
 if (Ti.App.Properties.getString('authenticationToken')
  && Ti.App.Properties.getString('userShardId')
  && Ti.App.Properties.getDouble('expired') > 0
