@@ -39,6 +39,9 @@ namespace('EvCl.Evernote', function(exports){
 		if(args.notebook){
 			filter.notebookGuid = args.notebook.guid;
 		}
+		if(args.tag){
+			filter.tagGuids = [ args.tag.guid];
+		}
 		notestore.findNotes(Ti.App.Properties.getString('authenticationToken'), filter, 0, 100, function(e){
 			if(e.type == 'success'){
 				args.success(e.result);

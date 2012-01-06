@@ -1,10 +1,22 @@
 namespace('EvCl.UI', function(exports){
-	exports.createNotesWindow = function(notebook){
+	exports.createNotesWindow = function(args){
+		var title;
+		var notebook = null;
+		if(args.notebook){
+			notebook = args.notebook;
+			title = notebook.name;
+		} 
+		var tag = null;
+		if(args.tag){
+			tag = args.tag;
+			title = tag.name;
+		}
+		
 		/*
 		 * UI Layout definitions
 		 */
 		var window = Ti.UI.createWindow({
-			title:notebook.name,
+			title:title,
 			barColor:'#338844',
 		});
 		
@@ -69,9 +81,10 @@ namespace('EvCl.UI', function(exports){
 			return row;
 		};
 		
-		var findNotes = function(notebook){
+		var findNotes = function(){
 			EvCl.Evernote.findNotes({
 				notebook:notebook,
+				tag:tag,
 				success:function(noteList){
 					notesTable.data = noteList.notes.map(function(note){
 						return createNoteRow(note);
@@ -89,7 +102,7 @@ namespace('EvCl.UI', function(exports){
 		 * Event Handlers
 		 */
 		window.addEventListener('open', function(e){
-			findNotes(notebook);
+			findNotes();
 		});	
 		
 		addNoteButton.addEventListener('click', function(){
@@ -97,7 +110,7 @@ namespace('EvCl.UI', function(exports){
 		});
 
 		Ti.App.fireEvent('app:noteAdded', function(){
-			findNotes(notebook);
+			findNotes();
 		});
 		
 		return window;
