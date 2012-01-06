@@ -1,37 +1,37 @@
 namespace('EvCl.UI', function(exports){
-	exports.createNotebooksWindow = function(){
+	exports.createTagsWindow = function(){
 		/*
 		 * UI Layout definitions
 		 */
 		var window = Ti.UI.createWindow({
 			barColor:'#338844',
-			title:L('Notebooks')
+			title:L('Tags')
 		});
 		
-		var notebooksTable = Ti.UI.createTableView({
+		var tagsTable = Ti.UI.createTableView({
 		});
-		window.add(notebooksTable);
+		window.add(tagsTable);
 		
-		var addNotebookButton = Ti.UI.createButton({
+		var addTagButton = Ti.UI.createButton({
 			systemButton:Ti.UI.iPhone.SystemButton.ADD
 		});
-		window.rightNavButton = addNotebookButton;
-
+		window.rightNavButton = addTagButton;
+		
 		/*
 		 * Functions
 		 */
-		var createNotebookRow = function(notebook){
+		var createTagRow = function(tag){
 			var row = Ti.UI.createTableViewRow({
 				height:48,
 				hasChild:true,
-				notebook:notebook
+				tag:tag
 			});
 			
 			var image = Ti.UI.createImageView({
-				image:'images/notebook.png',
+				image:'images/tags_icon.png',
 				left:4,
-				width:32,
-				height:32
+				width:36,
+				height:36
 			});
 			row.add(image);
 			
@@ -39,16 +39,16 @@ namespace('EvCl.UI', function(exports){
 				left:45,
 				right:0,
 				height:'auto',
-				text:notebook.name,
+				text:tag.name,
 				color:'#000000'
 			});
 			row.add(title);
 			
 			row.addEventListener('click', function(e){
-				var notebook = e.rowData.notebook;
+				var tag = e.rowData.tag;
 				EvCl.UI.currentTab.open(
 					EvCl.UI.createNotesWindow({
-						notebook:notebook
+						tag:tag
 					})
 				);
 			});
@@ -56,11 +56,11 @@ namespace('EvCl.UI', function(exports){
 			return row;
 		};
 		
-		var listNotebooks = function(){
-			EvCl.Evernote.listNotebooks({
-				success:function(notebooks){
-					notebooksTable.data = notebooks.map(function(notebook){
-						return createNotebookRow(notebook);
+		var listTags = function(){
+			EvCl.Evernote.listTags({
+				success:function(tags){
+					tagsTable.data = tags.map(function(tag){
+						return createTagRow(tag);
 					});
 				},
 				error:function(error){
@@ -75,44 +75,38 @@ namespace('EvCl.UI', function(exports){
 		 * Event Handlers
 		 */		
 		Ti.App.addEventListener('app:authenticated', function(e){
-			listNotebooks();
+			listTags();
+		});		
+		
+		Ti.App.addEventListener('app:tagAdded', function(e){
+			listTags();
 		});
 
-		Ti.App.addEventListener('app:notebookAdded', function(e){
-			listNotebooks();
+		Ti.App.addEventListener('app:noteAdded', function(e){
+			listTags();
 		});
 		
-		addNotebookButton.addEventListener('click', function(){
-			EvCl.UI.currentTab.open(EvCl.UI.createAddNotebookWindow());
+		addTagButton.addEventListener('click', function(){
+			EvCl.UI.currentTab.open(EvCl.UI.createAddTagWindow());
 		});
-		
-		return window;
+
+		return window;		
 	}
 	
-	exports.createAddNotebookWindow = function(){
+	exports.createAddTagWindow = function(notebook){
 		/*
 		 * UI Layout definitions
 		 */
 		var window = Ti.UI.createWindow({
-			barColor:'#338844',
+			title:L('Add Tag'),
 			backgroundColor:'#d8dfea',
-			title:L('Add Notebook')
+			backButtonTitle:L('Back'),
+			barColor:'#338844',
 		});
-		
-		var titleField = Ti.UI.createTextField({
-			top:40,
-			left:8,
-			right:8,
-			color:'black',
-			hintText:'Enter new notebook name',
-			height:40,
-	        borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED
-		});
-		window.add(titleField);
 		
 		var addButton = Ti.UI.createButton({
 			title:L('Add')
-		})
+		});
 		window.rightNavButton = addButton;
 		
 		var addingIndicator = Ti.UI.createActivityIndicator({
@@ -120,6 +114,17 @@ namespace('EvCl.UI', function(exports){
 			height:32,
 			visible:true
 		});
+		
+		var titleField = Ti.UI.createTextField({
+			top:40,
+			left:8,
+			right:8,
+			color:'black',
+			hintText:'Enter new tag name',
+			height:40,
+	        borderStyle:Ti.UI.INPUT_BORDERSTYLE_ROUNDED
+		});
+		window.add(titleField);
 		
 		/*
 		 * Event Handlers
@@ -130,16 +135,16 @@ namespace('EvCl.UI', function(exports){
 		
 		addButton.addEventListener('click', function(e){
 			if(!titleField.value){
-				alert(L("Please enter notebook name."));
+				alert(L("Please enter tag name."));
 				return;
 			}
 			window.rightNavButton = addingIndicator;
-			EvCl.Evernote.addNotebook({
+			EvCl.Evernote.addTag({
 				name:titleField.value,
 				success:function(){
 					window.close();
 					window.rightNavButton = addButton;
-					Ti.App.fireEvent("app:notebookAdded");
+					Ti.App.fireEvent("app:tagAdded");
 				},
 				error:function(){
 					window.rightNavButton = addButton;

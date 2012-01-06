@@ -21,9 +21,11 @@ Ti.include('evernote/api.js');
 Ti.include('evernote/authenticate.js');
 Ti.include('evernote/notebook.js');
 Ti.include('evernote/note.js');
+Ti.include('evernote/tag.js');
 Ti.include('ui/login.js');
 Ti.include('ui/notebooks.js');
 Ti.include('ui/notes.js');
+Ti.include('ui/tags.js');
 
 var tabGroup = Ti.UI.createTabGroup();
 
@@ -33,6 +35,14 @@ var notebooksTab = Ti.UI.createTab({
 	icon:'images/notebooks_icon.png'
 });
 tabGroup.addTab(notebooksTab);
+
+var tagsTab = Ti.UI.createTab({
+	window:EvCl.UI.createTagsWindow(),
+	title:L('Tags'),
+	icon:'images/tags_icon.png'
+});
+tabGroup.addTab(tagsTab);
+
 
 EvCl.UI.currentTab = notebooksTab;  
 tabGroup.addEventListener('focus', function(e){
