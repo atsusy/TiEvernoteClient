@@ -113,7 +113,7 @@ namespace('EvCl.UI', function(exports){
 		editButton.addEventListener('click', function(){
 			tagsTable.editing = !tagsTable.editing;
 		});
-
+        
 		return window;		
 	}
 	
