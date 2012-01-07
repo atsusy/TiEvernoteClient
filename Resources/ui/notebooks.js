@@ -17,6 +17,11 @@ namespace('EvCl.UI', function(exports){
 		});
 		window.rightNavButton = addNotebookButton;
 
+		var editButton = Ti.UI.createButton({
+			systemButton:Ti.UI.iPhone.SystemButton.EDIT
+		});
+		window.leftNavButton = editButton;
+
 		/*
 		 * Functions
 		 */
@@ -84,6 +89,25 @@ namespace('EvCl.UI', function(exports){
 		
 		addNotebookButton.addEventListener('click', function(){
 			EvCl.UI.currentTab.open(EvCl.UI.createAddNotebookWindow());
+		});
+		
+		editButton.addEventListener('click', function(){
+			notebooksTable.editing = !notebooksTable.editing;
+		});
+		
+		notebooksTable.addEventListener('delete', function(e){
+			EvCl.Evernote.deleteNotebook(e.rowData.notebook, {
+				success:function(){
+					Ti.API.info("delete notebook:"+e.rowData.notebook.name);
+				},
+				error:function(error){
+					/*
+					 * TODO
+					 */
+					alert(error);
+					listNotebooks();
+				}
+			});
 		});
 		
 		return window;

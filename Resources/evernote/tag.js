@@ -45,4 +45,25 @@ namespace('EvCl.Evernote', function(exports){
 			}
 		});
 	}
+	
+	exports.deleteTag = function(tag, callback){
+		EvCl.Evernote.refreshAuthentication({
+			success:function(){},
+			error:function(error){
+				var loginWindow = EvCl.UI.createLoginWindow();
+				loginWindow.open({
+					modal:true
+				});
+			}
+		});
+		
+		var notestore = api.createNoteStoreClient(config.url+"note/"+Ti.App.Properties.getString('userShardId'));
+		notestore.expungeTag(Ti.App.Properties.getString('authenticationToken'), tag.guid, function(e){
+			if(e.type == 'success'){
+				callback.success();
+			}else{
+				callback.error(e.error);
+			}
+		});
+	}
 });

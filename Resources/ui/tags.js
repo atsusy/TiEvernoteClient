@@ -17,6 +17,11 @@ namespace('EvCl.UI', function(exports){
 		});
 		window.rightNavButton = addTagButton;
 		
+		var editButton = Ti.UI.createButton({
+			systemButton:Ti.UI.iPhone.SystemButton.EDIT
+		});
+		window.leftNavButton = editButton;
+		
 		/*
 		 * Functions
 		 */
@@ -86,8 +91,27 @@ namespace('EvCl.UI', function(exports){
 			listTags();
 		});
 		
+		tagsTable.addEventListener('delete', function(e){
+			EvCl.Evernote.deleteTag(e.rowData.tag, {
+				success:function(){
+					Ti.API.info("deleted tag:"+e.rowData.tag.name);
+				},
+				error:function(error){
+					/*
+					 * TODO
+					 */
+					alert(error);
+					listTags();
+				}
+			});
+		});
+		
 		addTagButton.addEventListener('click', function(){
 			EvCl.UI.currentTab.open(EvCl.UI.createAddTagWindow());
+		});
+		
+		editButton.addEventListener('click', function(){
+			tagsTable.editing = !tagsTable.editing;
 		});
 
 		return window;		
